@@ -16,7 +16,7 @@ const App: React.FC = () => {
     <>
       <Header />
       <main className="w-full mx-auto">
-        <ImageUpload id="image" errorText="Please provide a image."/>
+        <ImageUpload id="image" errorText="Please provide a image." />
       </main>
     </>
   );

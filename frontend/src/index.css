@@ -7,5 +7,5 @@
 }
 
 body {
-  @apply bg-[var(--tg-theme-bg-color)] text-[var(--tg-theme-text-color)]
+  @apply bg-[var(--tg-theme-bg-color)] text-[var(--tg-theme-text-color)];
 }
