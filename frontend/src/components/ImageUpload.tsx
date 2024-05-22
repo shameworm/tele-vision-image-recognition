@@ -12,7 +12,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
   const [file, setFile] = useState<File>();
   const [previewUrl, setPreviewUrl] = useState<string>();
   const [isValid, setIsValid] = useState(false);
-  const { onClose } = useTelegram();
+  const { tg, onClose } = useTelegram();
 
   const filePickerRef = useRef<HTMLInputElement | null>();
 
@@ -43,6 +43,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
     }
     console.log(fileIsValid);
     // onInput(id, pickedFile, fileIsValid);
+
+    if (!fileIsValid) {
+      tg.MainButton.hide();
+    } else {
+      tg.MainButton.show();
+      tg.MainButton.setParams({
+        text: "Send",
+      });
+    }
   };
 
   const handleImagePick = () => {
