@@ -74,7 +74,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
           PICK IMAGE
         </Button>
       </div>
-      {!isValid && <p>{errorText}</p>}
+      {!isValid && <p className="mx-auto">{errorText}</p>}
     </div>
   );
 };

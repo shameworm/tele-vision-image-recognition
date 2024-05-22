@@ -6,11 +6,11 @@ import Header from "./components/Header";
 import ImageUpload from "./components/ImageUpload";
 
 const App: React.FC = () => {
-  const { onStart } = useTelegram();
+  const { tg } = useTelegram();
 
   useEffect(() => {
-    onStart();
-  }, [onStart]);
+    tg.ready();
+  }, [tg]);
 
   return (
     <>
