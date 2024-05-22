@@ -3,7 +3,7 @@ import { useTelegram } from "./hooks/useTelegram";
 import { useEffect } from "react";
 
 import Header from "./components/Header";
-import Form from "./components/Form";
+import ImageUpload from "./components/ImageUpload";
 
 const App: React.FC = () => {
   const { onStart } = useTelegram();
@@ -16,7 +16,7 @@ const App: React.FC = () => {
     <>
       <Header />
       <main className="w-full mx-auto">
-        <Form />
+        <ImageUpload id="image" errorText="Please provide a image."/>
       </main>
     </>
   );
