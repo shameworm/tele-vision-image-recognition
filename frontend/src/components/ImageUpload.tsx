@@ -50,7 +50,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
   };
 
   return (
-    <div className="form-control">
+    <div className="my-4 mx-0">
       <input
         id={id}
         ref={filePickerRef as ForwardedRef<HTMLInputElement>}
@@ -59,9 +59,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
         accept=".jpg,.png,.jpeg"
         onChange={handlePick}
       />
-      <div className={"image-upload text-center"}>
-        <div className="image-upload__preview">
-          {previewUrl && <img src={previewUrl} alt="Preview" />}
+      <div className={"flex justify-center items-center flex-col text-center"}>
+        <div className="w-52 h-52 border border-solid border-b-[var(--tg-theme-button-color)] flex justify-center items-center text-center mb-4">
+          {previewUrl && (
+            <img
+              src={previewUrl}
+              className="w-full h-full object-cover"
+              alt="Preview"
+            />
+          )}
           {!previewUrl && <p>Please pick an image.</p>}
         </div>
         <Button type="button" onClick={handleImagePick}>
