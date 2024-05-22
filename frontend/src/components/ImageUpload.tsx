@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, ForwardedRef } from "react";
 
 import Button from "./Button";
+import { useTelegram } from "../hooks/useTelegram";
 
 interface ImageUploadProps {
   id: string;
@@ -11,6 +12,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
   const [file, setFile] = useState<File>();
   const [previewUrl, setPreviewUrl] = useState<string>();
   const [isValid, setIsValid] = useState(false);
+  const { onClose } = useTelegram();
 
   const filePickerRef = useRef<HTMLInputElement | null>();
 
@@ -50,7 +52,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
   };
 
   return (
-    <div className="my-4 mx-0">
+    <div className="my-8 mx-0">
       <input
         id={id}
         ref={filePickerRef as ForwardedRef<HTMLInputElement>}
@@ -70,9 +72,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
           )}
           {!previewUrl && <p>Please pick an image.</p>}
         </div>
-        <Button type="button" onClick={handleImagePick}>
-          PICK IMAGE
-        </Button>
+        <div className="flex flex-wrap justify-between items-center gap-2">
+          <Button type="button" onClick={onClose}>
+            Close
+          </Button>
+          <Button type="button" onClick={handleImagePick}>
+            PICK IMAGE
+          </Button>
+        </div>
       </div>
       {!isValid && <p className="mt-2 text-center">{errorText}</p>}
     </div>

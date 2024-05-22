@@ -14,5 +14,6 @@ export const useTelegram = () => {
     user: tg.initDataUnsafe.user,
     onClose,
     onStart,
+    backButton: tg.BackButton
   };
 };
