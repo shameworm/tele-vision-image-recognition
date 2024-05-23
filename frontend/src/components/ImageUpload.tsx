@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, ForwardedRef, useCallback } from "react";
+
 import Button from "./Button";
 import { useTelegram } from "../hooks/useTelegram";
 
@@ -8,39 +9,75 @@ interface ImageUploadProps {
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
-  const [file, setFile] = useState<File | null>(null); // Use null instead of undefined
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null); // Use null instead of undefined
+  const [file, setFile] = useState<File>();
+  const [previewUrl, setPreviewUrl] = useState<string>();
+  const [isValid, setIsValid] = useState(false);
   const { tg, onClose } = useTelegram();
-  const filePickerRef = useRef<HTMLInputElement | null>(null);
+
+  const filePickerRef = useRef<HTMLInputElement | null>();
+
+  const onSendData = useCallback(() => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const imageData = reader.result?.toString().split(",")[1];
+        if (imageData) {
+          const data = {
+            image: imageData,
+            filename: file.name,
+          };
+          fetch("http://localhost:3000/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          });
+          tg.sendData(JSON.stringify(data));
+        }
+      };
+    }
+  }, [tg, file]);
 
   useEffect(() => {
-    // Set main button visibility initially
-    if (file) {
+    tg.onEvent("mainButtonClicked", onSendData);
+    return () => {
+      tg.offEvent("mainButtonClicked", onSendData);
+    };
+  }, [tg, onSendData]);
+
+  useEffect(() => {
+    if (!file) {
+      return;
+    }
+    const fileReader = new FileReader();
+    fileReader.onload = () => {
+      setPreviewUrl(fileReader.result as string);
+    };
+    fileReader.readAsDataURL(file);
+  }, [file]);
+
+  const handlePick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let pickedFile;
+    let fileIsValid = isValid;
+
+    if (event.target.files && event.target.files.length === 1) {
+      pickedFile = event.target.files[0];
+      setFile(pickedFile);
+      setIsValid(true);
+      fileIsValid = true;
+    } else {
+      setIsValid(false);
+      fileIsValid = false;
+    }
+
+    if (!fileIsValid) {
+      tg.MainButton.hide();
+    } else {
       tg.MainButton.show();
       tg.MainButton.setParams({
         text: "Send",
       });
-    } else {
-      tg.MainButton.hide();
-    }
-  }, [file, tg.MainButton]);
-
-  const handlePick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const pickedFile =
-      event.target.files && event.target.files.length === 1
-        ? event.target.files[0]
-        : null;
-    setFile(pickedFile);
-    if (pickedFile) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === "string") {
-          setPreviewUrl(reader.result);
-        }
-      };
-      reader.readAsDataURL(pickedFile);
-    } else {
-      setPreviewUrl(null);
     }
   };
 
@@ -49,32 +86,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
       filePickerRef.current.click();
     }
   };
-
-  const onSendData = useCallback(() => {
-    if (file) {
-      const formData = new FormData();
-      formData.append("image", file);
-      fetch("http://localhost:3000/", {
-        method: "POST",
-        body: formData,
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to upload image.");
-          }
-        })
-        .catch((error) => {
-          console.error("Error uploading image:", error);
-        });
-    }
-  }, [file]);
-
-  useEffect(() => {
-    tg.onEvent("mainButtonClicked", onSendData);
-    return () => {
-      tg.offEvent("mainButtonClicked", onSendData);
-    };
-  }, [tg, onSendData]);
 
   return (
     <div className="my-8 mx-0">
@@ -101,12 +112,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
           <Button type="button" onClick={onClose}>
             Close
           </Button>
-          <Button type="button" onClick={handleImagePick}>
+          <Button type="submit" onClick={handleImagePick}>
             PICK IMAGE
           </Button>
         </div>
       </div>
-      {!file && <p className="mt-2 text-center">{errorText}</p>}
+      {!isValid && <p className="mt-2 text-center">{errorText}</p>}
     </div>
   );
 };
