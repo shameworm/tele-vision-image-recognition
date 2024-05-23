@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, ForwardedRef } from "react";
+import { useRef, useState, useEffect, ForwardedRef, useCallback } from "react";
 
 import Button from "./Button";
 import { useTelegram } from "../hooks/useTelegram";
@@ -15,6 +15,29 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
   const { tg, onClose } = useTelegram();
 
   const filePickerRef = useRef<HTMLInputElement | null>();
+
+  const onSendData = useCallback(() => {
+    if (!file) return;
+
+    const data = new FormData();
+    data.append("image", file);
+
+    fetch("http:localhost:3000", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    tg.sendData(JSON.stringify(data));
+  }, [file, tg]);
+
+  useEffect(() => {
+    tg.onEvent("mainButtonClicked", onSendData);
+    return () => {
+      tg.offEvent("mainButtonClicked", onSendData);
+    };
+  }, [tg, onSendData]);
 
   useEffect(() => {
     if (!file) {
@@ -61,7 +84,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
   };
 
   return (
-    <form className="my-8 mx-0" method="POST">
+    <div className="my-8 mx-0">
       <input
         id={id}
         ref={filePickerRef as ForwardedRef<HTMLInputElement>}
@@ -91,7 +114,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
         </div>
       </div>
       {!isValid && <p className="mt-2 text-center">{errorText}</p>}
-    </form>
+    </div>
   );
 };
 
