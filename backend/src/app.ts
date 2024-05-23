@@ -5,6 +5,8 @@ import express from "express";
 import OpenAI from "openai";
 import multer from "multer";
 
+import fileUpload from "./middleware/file-upload";
+
 dotenv.config();
 
 const botToken = process.env.telegramToken;
@@ -47,28 +49,26 @@ bot.on("message", async (message) => {
   }
 });
 
-app.post("/upload", upload.single("image"), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded." });
-  }
-
+app.post("/upload", fileUpload.single("image"), async (req, res) => {
   const { file, queryId } = req.body;
-
   try {
-    const imagePath = file;
-    const image = fs.readFileSync(imagePath);
-
     await bot.answerWebAppQuery(queryId, {
       type: "article",
       id: queryId,
       title: "Success",
       input_message_content: {
-        message_text: `img: ${image}, img ${imagePath}`,
+        message_text: `File ${file}`,
       },
     });
-    res.status(200).json();
-  } catch (error) {
-    res.status(500).json({ message: "An unknown error occured!" });
+    return res.status(200).json();
+  } catch (e) {
+    await bot.answerWebAppQuery(queryId, {
+      type: "article",
+      id: queryId,
+      title: "Failed to purchase.",
+      input_message_content: { message_text: `Error.` },
+    });
+    return res.status(500).json();
   }
 });
 
