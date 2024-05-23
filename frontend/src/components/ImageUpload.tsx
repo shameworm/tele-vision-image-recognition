@@ -61,7 +61,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
   };
 
   return (
-    <div className="my-8 mx-0">
+    <form className="my-8 mx-0" method="POST">
       <input
         id={id}
         ref={filePickerRef as ForwardedRef<HTMLInputElement>}
@@ -85,13 +85,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
           <Button type="button" onClick={onClose}>
             Close
           </Button>
-          <Button type="button" onClick={handleImagePick}>
+          <Button type="submit" onClick={handleImagePick}>
             PICK IMAGE
           </Button>
         </div>
       </div>
       {!isValid && <p className="mt-2 text-center">{errorText}</p>}
-    </div>
+    </form>
   );
 };
 

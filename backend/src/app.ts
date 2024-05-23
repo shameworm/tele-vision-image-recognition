@@ -1,19 +1,39 @@
+import path from "path";
+import fs from "fs";
 import * as dotenv from "dotenv";
 import TelegramBot from "node-telegram-bot-api";
 import express from "express";
-import { userInfo } from "os";
+import OpenAI from "openai";
+import multer from "multer";
 
 dotenv.config();
 
 const botToken = process.env.telegramToken;
-const webUrl = "https://lively-jelly-5cec5a.netlify.app/";
+const openAIkey = process.env.openAIkey;
+const webUrl = process.env.webUrl;
 
-if (!botToken) {
-  throw new Error("Bot token is missing or invalid.");
+if (!botToken || !openAIkey || !webUrl) {
+  throw new Error(
+    "Error occured. Please check Web URL, OpenAIkey or botToken."
+  );
 }
 
+const app = express();
+const upload = multer({ dest: "uploads/" });
 const bot = new TelegramBot(botToken, { polling: true });
-// const app = express();
+const openai = new OpenAI();
+openai.apiKey = openAIkey;
+
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+
+  next();
+});
 
 bot.on("message", async (message) => {
   if (message.text === "/start") {
@@ -28,3 +48,35 @@ bot.on("message", async (message) => {
     );
   }
 });
+
+app.post("/", upload.single("image"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded." });
+  }
+
+  try {
+    const imagePath = req.file.path;
+    const image = fs.readFileSync(imagePath);
+
+    console.log(imagePath), console.log(image);
+    // const response = await openai.chat.completions.create({
+    //   model: "gpt-4o",
+    //   messages: [
+    //     {
+    //       role: "user",
+    //       content: [
+    //         { type: "text", text: "What’s in this image?" },
+    //         {
+    //           type: "image_url",
+
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // });
+  } catch (error) {
+    res.status(500).json({ message: "An unknown error occured!" });
+  }
+});
+
+app.listen(process.env.PORT || 3000);
