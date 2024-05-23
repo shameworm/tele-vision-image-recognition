@@ -1,4 +1,3 @@
-import path from "path";
 import fs from "fs";
 import * as dotenv from "dotenv";
 import TelegramBot from "node-telegram-bot-api";
@@ -19,7 +18,7 @@ if (!botToken || !openAIkey || !webUrl) {
 }
 
 const app = express();
-const upload = multer({ dest: "src/uploads/" });
+const upload = multer({ dest: "./uploads" });
 const bot = new TelegramBot(botToken, { polling: true });
 const openai = new OpenAI({ apiKey: openAIkey });
 
@@ -53,22 +52,21 @@ app.post("/upload", upload.single("image"), async (req, res) => {
     return res.status(400).json({ message: "No file uploaded." });
   }
 
-  const { image, queryId } = req.body;
+  const { file, queryId } = req.body;
 
   try {
-    const imagePath = image;
-    const img = fs.readFileSync(imagePath);
+    const imagePath = file;
+    const image = fs.readFileSync(imagePath);
 
     await bot.answerWebAppQuery(queryId, {
       type: "article",
       id: queryId,
       title: "Success",
       input_message_content: {
-        message_text: `img: ${img}, img ${imagePath}`,
+        message_text: `img: ${image}, img ${imagePath}`,
       },
     });
-    fs.unlinkSync(imagePath);
-    return res.status(200).json();
+    res.status(200).json();
   } catch (error) {
     res.status(500).json({ message: "An unknown error occured!" });
   }

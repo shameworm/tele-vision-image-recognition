@@ -19,8 +19,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
 
   const onSendData = useCallback(() => {
     const data = {
-      queryId: queryId,
-      image: file,
+      queryId,
+      file
     };
 
     axios.post("http://localhost:3000/upload", {
