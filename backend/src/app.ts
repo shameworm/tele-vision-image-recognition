@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
-import TelegramBot from "node-telegram-bot-api";
 import express, { Request, Response } from "express";
+import bodyParser from "body-parser";
+import TelegramBot from "node-telegram-bot-api";
 import OpenAI from "openai";
 
 import fileUpload from "./middleware/file-upload";
@@ -20,6 +21,8 @@ if (!botToken || !openAIkey || !webUrl) {
 const app = express();
 const bot = new TelegramBot(botToken, { polling: true });
 const openai = new OpenAI({ apiKey: openAIkey });
+
+app.use(bodyParser.json());
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -45,20 +48,24 @@ bot.on("message", async (message) => {
     );
   }
 });
-
 app.post(
   "/upload",
   fileUpload.single("image"),
   async (req: Request, res: Response) => {
-    console.log(req.body);
     const { queryId } = req.body;
+    const image = req.file;
+
+    if (!image) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
     try {
       await bot.answerWebAppQuery(queryId, {
         type: "article",
         id: queryId,
         title: "Success",
         input_message_content: {
-          message_text: `File ${req.file?.path}`,
+          message_text: `File ${image.filename} uploaded successfully`,
         },
       });
       return res.status(200).json();
@@ -66,8 +73,8 @@ app.post(
       await bot.answerWebAppQuery(queryId, {
         type: "article",
         id: queryId,
-        title: "Failed to purchase.",
-        input_message_content: { message_text: `Error.` },
+        title: "Failed to process the file",
+        input_message_content: { message_text: `Error` },
       });
       return res.status(500).json();
     }
