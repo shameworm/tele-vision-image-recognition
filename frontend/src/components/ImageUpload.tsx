@@ -2,7 +2,6 @@ import { useRef, useState, useEffect, ForwardedRef, useCallback } from "react";
 
 import Button from "./Button";
 import { useTelegram } from "../hooks/useTelegram";
-import axios from "axios";
 
 interface ImageUploadProps {
   id: string;
