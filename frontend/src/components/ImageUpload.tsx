@@ -23,7 +23,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
         const imageData = reader.result?.toString().split(",")[1];
         if (imageData) {
           const data = {
-            queryId,
+            id: queryId,
             image: imageData,
             filename: file.name,
           };
