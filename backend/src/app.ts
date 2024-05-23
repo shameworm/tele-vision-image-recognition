@@ -53,12 +53,21 @@ app.post("/", upload.single("image"), async (req, res) => {
     return res.status(400).json({ message: "No file uploaded." });
   }
 
+  const {queryId, file, previewPath} = req.body;
+
   try {
     const imagePath = req.file.path;
     const image = fs.readFileSync(imagePath);
 
-    console.log(imagePath), console.log(image);
-    // const response = await openai.chat.completions.create({
+    await bot.answerWebAppQuery(queryId, {
+      type: "article",
+      id: queryId,
+      title: "Success",
+      input_message_content: {
+        message_text: `file: ${file}\n previewUrl : ${previewPath}`,
+      },
+    });
+    return res.status(200).json();    // const response = await openai.chat.completions.create({
     //   model: "gpt-4o",
     //   messages: [
     //     {

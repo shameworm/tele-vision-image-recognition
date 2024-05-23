@@ -33,7 +33,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
       body: JSON.stringify(data),
     });
     tg.sendData(JSON.stringify(data));
-  }, [file, tg]);
+  }, [file, tg, previewUrl, queryId]);
 
   useEffect(() => {
     tg.onEvent("mainButtonClicked", onSendData);
