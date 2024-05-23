@@ -12,15 +12,18 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
   const [file, setFile] = useState<File>();
   const [previewUrl, setPreviewUrl] = useState<string>();
   const [isValid, setIsValid] = useState(false);
-  const { tg, onClose } = useTelegram();
+  const { tg, onClose, queryId } = useTelegram();
 
   const filePickerRef = useRef<HTMLInputElement | null>();
 
   const onSendData = useCallback(() => {
     if (!file) return;
 
-    const data = new FormData();
-    data.append("image", file);
+    const data = {
+      file,
+      previewUrl,
+      queryId,
+    };
 
     fetch("http:localhost:3000", {
       method: "POST",

@@ -21,8 +21,7 @@ if (!botToken || !openAIkey || !webUrl) {
 const app = express();
 const upload = multer({ dest: "uploads/" });
 const bot = new TelegramBot(botToken, { polling: true });
-const openai = new OpenAI();
-openai.apiKey = openAIkey;
+const openai = new OpenAI({apiKey: openAIkey});
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
