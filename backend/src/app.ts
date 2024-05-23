@@ -19,9 +19,9 @@ if (!botToken || !openAIkey || !webUrl) {
 }
 
 const app = express();
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: "src/uploads/" });
 const bot = new TelegramBot(botToken, { polling: true });
-const openai = new OpenAI({apiKey: openAIkey});
+const openai = new OpenAI({ apiKey: openAIkey });
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -53,37 +53,27 @@ app.post("/", upload.single("image"), async (req, res) => {
     return res.status(400).json({ message: "No file uploaded." });
   }
 
-  const {queryId, file, previewPath} = req.body;
+  const { queryId } = req.body;
 
   try {
     const imagePath = req.file.path;
-    const image = fs.readFileSync(imagePath);
 
     await bot.answerWebAppQuery(queryId, {
       type: "article",
       id: queryId,
       title: "Success",
       input_message_content: {
-        message_text: `file: ${file}\n previewUrl : ${previewPath}`,
+        message_text:
+          "Image uploaded successfully. You can view it here: " +
+          webUrl +
+          imagePath,
       },
     });
-    return res.status(200).json();    // const response = await openai.chat.completions.create({
-    //   model: "gpt-4o",
-    //   messages: [
-    //     {
-    //       role: "user",
-    //       content: [
-    //         { type: "text", text: "What’s in this image?" },
-    //         {
-    //           type: "image_url",
 
-    //         },
-    //       ],
-    //     },
-    //   ],
-    // });
+    return res.status(200).json();
   } catch (error) {
-    res.status(500).json({ message: "An unknown error occured!" });
+    console.error(error);
+    res.status(500).json({ message: "An unknown error occurred!" });
   }
 });
 

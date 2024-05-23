@@ -1,6 +1,6 @@
-import { useTelegram } from "./hooks/useTelegram";
-
 import { useEffect } from "react";
+
+import { useTelegram } from "./hooks/useTelegram";
 
 import Header from "./components/Header";
 import ImageUpload from "./components/ImageUpload";
