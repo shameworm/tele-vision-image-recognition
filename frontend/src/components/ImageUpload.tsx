@@ -2,6 +2,7 @@ import { useRef, useState, useEffect, ForwardedRef, useCallback } from "react";
 
 import Button from "./Button";
 import { useTelegram } from "../hooks/useTelegram";
+import axios from "axios";
 
 interface ImageUploadProps {
   id: string;
@@ -17,28 +18,23 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
   const filePickerRef = useRef<HTMLInputElement | null>();
 
   const onSendData = useCallback(() => {
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const imageData = reader.result?.toString().split(",")[1];
-        if (imageData) {
-          const data = {
-            id: queryId,
-            image: imageData,
-            filename: file.name,
-          };
-          fetch("http://localhost:3000/", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          });
-          tg.sendData(JSON.stringify(data));
-        }
+    if (file && queryId) {
+      const data = {
+        queryId: queryId,
+        image: file,
       };
+
+      axios.post("http://localhost:3000", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      tg.sendData(JSON.stringify(data));
     }
-  }, [tg, file, queryId]);
+  }, [tg, queryId, file]);
 
   useEffect(() => {
     tg.onEvent("mainButtonClicked", onSendData);

@@ -53,27 +53,13 @@ app.post("/", upload.single("image"), async (req, res) => {
     return res.status(400).json({ message: "No file uploaded." });
   }
 
-  const { queryId } = req.body;
-
   try {
     const imagePath = req.file.path;
+    const image = fs.readFileSync(imagePath);
 
-    await bot.answerWebAppQuery(queryId, {
-      type: "article",
-      id: queryId,
-      title: "Success",
-      input_message_content: {
-        message_text:
-          "Image uploaded successfully. You can view it here: " +
-          webUrl +
-          imagePath,
-      },
-    });
-
-    return res.status(200).json();
+    fs.unlinkSync(imagePath);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "An unknown error occurred!" });
+    res.status(500).json({ message: "An unknown error occured!" });
   }
 });
 
