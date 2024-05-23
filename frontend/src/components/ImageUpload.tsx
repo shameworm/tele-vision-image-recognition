@@ -12,7 +12,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
   const [file, setFile] = useState<File>();
   const [previewUrl, setPreviewUrl] = useState<string>();
   const [isValid, setIsValid] = useState(false);
-  const { tg, onClose } = useTelegram();
+  const { tg, onClose, queryId } = useTelegram();
 
   const filePickerRef = useRef<HTMLInputElement | null>();
 
@@ -23,6 +23,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
         const imageData = reader.result?.toString().split(",")[1];
         if (imageData) {
           const data = {
+            queryId,
             image: imageData,
             filename: file.name,
           };
