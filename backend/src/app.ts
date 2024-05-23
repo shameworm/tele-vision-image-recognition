@@ -48,7 +48,7 @@ bot.on("message", async (message) => {
   }
 });
 
-app.post("/", upload.single("image"), async (req, res) => {
+app.post("/upload", upload.single("image"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: "No file uploaded." });
   }

@@ -18,21 +18,19 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
   const filePickerRef = useRef<HTMLInputElement | null>();
 
   const onSendData = useCallback(() => {
-    if (file) {
-      const data = {
-        queryId: queryId,
-        image: file,
-      };
+    const data = {
+      queryId: queryId,
+      image: file,
+    };
 
-      axios.post("http://localhost:3000", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+    axios.post("http://localhost:3000/upload", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
 
-      tg.sendData(JSON.stringify(data));
-    }
+    tg.sendData(JSON.stringify(data));
   }, [tg, queryId, file]);
 
   useEffect(() => {
