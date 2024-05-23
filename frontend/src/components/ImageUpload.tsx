@@ -19,7 +19,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
   const onSendData = useCallback(() => {
     const data = {
       queryId,
-      image: "hello",
+      image: file,
     };
 
     fetch("http://localhost:3000/upload", {
@@ -31,7 +31,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
     });
 
     tg.sendData(JSON.stringify(data));
-  }, [tg, queryId]);
+  }, [tg, queryId, file]);
 
   useEffect(() => {
     tg.onEvent("mainButtonClicked", onSendData);

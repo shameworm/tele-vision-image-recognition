@@ -1,4 +1,3 @@
-import fs from "fs";
 import * as dotenv from "dotenv";
 import TelegramBot from "node-telegram-bot-api";
 import express from "express";
@@ -9,7 +8,7 @@ import fileUpload from "./middleware/file-upload";
 
 dotenv.config();
 
-const botToken = process.env.telegramToken;
+const botToken = process.env.botToken;
 const openAIkey = process.env.openAIkey;
 const webUrl = process.env.webUrl;
 
@@ -39,25 +38,20 @@ bot.on("message", async (message) => {
   if (message.text === "/start") {
     await bot.sendMessage(
       message.chat.id,
-      "Hello! Welcome to TeleVision - the mini-app for image recognition. Click the button bellow and send any image via form, and I'll try to identify its contents.",
-      {
-        reply_markup: {
-          keyboard: [[{ text: "Send image", web_app: { url: webUrl } }]],
-        },
-      }
+      "Hello! Welcome to TeleVision - the mini-app for image recognition. Click the send button bellow and send any image via form, and I'll try to identify its contents."
     );
   }
 });
 
 app.post("/upload", fileUpload.single("image"), async (req, res) => {
-  const { file, queryId } = req.body;
+  const { image, queryId } = req.body;
   try {
     await bot.answerWebAppQuery(queryId, {
       type: "article",
       id: queryId,
       title: "Success",
       input_message_content: {
-        message_text: `File ${file}`,
+        message_text: `File ${image}`,
       },
     });
     return res.status(200).json();
