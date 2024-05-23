@@ -14,7 +14,7 @@ const fileUpload: Multer = multer({
   limits: { fileSize: 500000 },
   storage: multer.diskStorage({
     destination: (req: Request, file: Express.Multer.File, cb: Function) => {
-      cb(null, "uploads/images");
+      cb(null, "./uploads/images");
     },
     filename: (req: Request, file: Express.Multer.File, cb: Function) => {
       const ext = MIME_TYPE_MAP[file.mimetype];

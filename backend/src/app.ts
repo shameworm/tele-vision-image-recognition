@@ -1,8 +1,7 @@
 import * as dotenv from "dotenv";
 import TelegramBot from "node-telegram-bot-api";
-import express from "express";
+import express, { Request, Response } from "express";
 import OpenAI from "openai";
-import multer from "multer";
 
 import fileUpload from "./middleware/file-upload";
 
@@ -19,7 +18,6 @@ if (!botToken || !openAIkey || !webUrl) {
 }
 
 const app = express();
-const upload = multer({ dest: "./uploads" });
 const bot = new TelegramBot(botToken, { polling: true });
 const openai = new OpenAI({ apiKey: openAIkey });
 
@@ -40,30 +38,40 @@ bot.on("message", async (message) => {
       message.chat.id,
       "Hello! Welcome to TeleVision - the mini-app for image recognition. Click the send button bellow and send any image via form, and I'll try to identify its contents."
     );
+  } else {
+    await bot.sendMessage(
+      message.chat.id,
+      "I'm sorry, currently I can be used only with Send button."
+    );
   }
 });
 
-app.post("/upload", fileUpload.single("image"), async (req, res) => {
-  const { image, queryId } = req.body;
-  try {
-    await bot.answerWebAppQuery(queryId, {
-      type: "article",
-      id: queryId,
-      title: "Success",
-      input_message_content: {
-        message_text: `File ${image}`,
-      },
-    });
-    return res.status(200).json();
-  } catch (e) {
-    await bot.answerWebAppQuery(queryId, {
-      type: "article",
-      id: queryId,
-      title: "Failed to purchase.",
-      input_message_content: { message_text: `Error.` },
-    });
-    return res.status(500).json();
+app.post(
+  "/upload",
+  fileUpload.single("image"),
+  async (req: Request, res: Response) => {
+    console.log(req.body);
+    const { queryId } = req.body;
+    try {
+      await bot.answerWebAppQuery(queryId, {
+        type: "article",
+        id: queryId,
+        title: "Success",
+        input_message_content: {
+          message_text: `File ${req.file?.path}`,
+        },
+      });
+      return res.status(200).json();
+    } catch (e) {
+      await bot.answerWebAppQuery(queryId, {
+        type: "article",
+        id: queryId,
+        title: "Failed to purchase.",
+        input_message_content: { message_text: `Error.` },
+      });
+      return res.status(500).json();
+    }
   }
-});
+);
 
 app.listen(process.env.PORT || 3000);

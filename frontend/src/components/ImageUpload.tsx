@@ -16,13 +16,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
 
   const filePickerRef = useRef<HTMLInputElement | null>();
 
-  const onSendData = useCallback(() => {
+  const onSendData = useCallback(async () => {
     const data = {
-      queryId,
       image: file,
+      queryId,
     };
 
-    fetch("http://localhost:3000/upload", {
+    await fetch("http://localhost:3000/upload", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
