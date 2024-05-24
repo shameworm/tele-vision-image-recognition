@@ -27,7 +27,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
         body: formData,
       });
 
-      tg.sendData(JSON.stringify(formData));
+      const formDataEntries: { [key: string]: unknown } = {};
+      formData.forEach((value, key) => {
+        formDataEntries[key] = value;
+      });
+
+      tg.sendData(JSON.stringify(formDataEntries));
     }
   }, [tg, queryId, file]);
 
