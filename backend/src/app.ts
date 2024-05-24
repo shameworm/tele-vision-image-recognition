@@ -54,10 +54,8 @@ app.post(
   "/",
   fileUpload.single("image"),
   async (req: Request, res: Response) => {
-    const { queryId } = req.body;
+    const { queryId, chatId } = req.body;
     const image = req.file;
-
-    console.log(image);
 
     if (!image) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -65,11 +63,8 @@ app.post(
 
     try {
       const photoUlr = `http://localhost:3000/uploads/images/${image.filename}`;
-      await bot.answerWebAppQuery(queryId, {
-        type: "photo",
-        id: queryId,
-        photo_url: photoUlr,
-        thumb_url: photoUlr,
+      await bot.sendPhoto(chatId, photoUlr, {
+        caption: "Here is the image you upload.",
       });
 
       return res.status(200).json();

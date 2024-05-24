@@ -91,6 +91,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
         id={id}
         ref={filePickerRef as ForwardedRef<HTMLInputElement>}
         style={{ display: "none" }}
+        name="image"
         type="file"
         accept=".jpg,.png,.jpeg"
         onChange={handlePick}
