@@ -22,16 +22,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
       formData.append("image", file);
       formData.append("queryId", queryId);
 
-      await fetch("http://localhost:3000", {
+      await fetch("http://localhost:3000/", {
         method: "POST",
         body: formData,
       });
 
-      const data = {
-        image: file.name,
-        queryId,
-      };
-      tg.sendData(JSON.stringify(data));
+      tg.sendData(JSON.stringify(formData));
     }
   }, [tg, queryId, file]);
 

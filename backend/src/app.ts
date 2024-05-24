@@ -54,8 +54,7 @@ app.post(
   "/",
   fileUpload.single("image"),
   async (req: Request, res: Response) => {
-    const { queryId, image} = req.body;
-    const imageFile = req.file?.path;
+    const { queryId, image } = req.body.formData;
 
     if (!image) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -65,8 +64,8 @@ app.post(
       await bot.answerWebAppQuery(queryId, {
         type: "photo",
         id: queryId,
-        photo_url: image,
-        thumb_url: image,
+        photo_url: image.path,
+        thumb_url: image.path,
       });
 
       return res.status(200).json();
