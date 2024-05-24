@@ -22,7 +22,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
       formData.append("image", file);
       formData.append("queryId", queryId);
 
-      await fetch("http://localhost:3000/upload", {
+      await fetch("http://localhost:3000", {
         method: "POST",
         body: formData,
       });

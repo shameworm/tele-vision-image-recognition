@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+import path from "path";
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import TelegramBot from "node-telegram-bot-api";
@@ -24,16 +25,21 @@ const openai = new OpenAI({ apiKey: openAIkey });
 
 app.use(bodyParser.json());
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+app.use(
+  "/uploads/images",
+  express.static(path.join(__dirname, "..", "uploads", "images"))
+);
 
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "*");
+//   res.setHeader(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+//   );
+//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+
+//   next();
+// });
 
 bot.on("message", async (message) => {
   if (message.text === "/start") {
@@ -41,19 +47,15 @@ bot.on("message", async (message) => {
       message.chat.id,
       "Hello! Welcome to TeleVision - the mini-app for image recognition. Click the send button bellow and send any image via form, and I'll try to identify its contents."
     );
-  } else {
-    await bot.sendMessage(
-      message.chat.id,
-      "I'm sorry, currently I can be used only with Send button."
-    );
   }
 });
+
 app.post(
-  "/upload",
+  "/",
   fileUpload.single("image"),
   async (req: Request, res: Response) => {
-    const { queryId } = req.body;
-    const image = req.file;
+    const { queryId, image} = req.body;
+    const imageFile = req.file?.path;
 
     if (!image) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -61,20 +63,19 @@ app.post(
 
     try {
       await bot.answerWebAppQuery(queryId, {
-        type: "article",
+        type: "photo",
         id: queryId,
-        title: "Success",
-        input_message_content: {
-          message_text: `File ${image.filename} uploaded successfully`,
-        },
+        photo_url: image,
+        thumb_url: image,
       });
+
       return res.status(200).json();
     } catch (e) {
       await bot.answerWebAppQuery(queryId, {
         type: "article",
         id: queryId,
         title: "Failed to process the file",
-        input_message_content: { message_text: `Error` },
+        input_message_content: { message_text: `Failed to process the file` },
       });
       return res.status(500).json();
     }
