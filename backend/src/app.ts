@@ -30,16 +30,16 @@ app.use(
   express.static(path.join(__dirname, "..", "uploads", "images"))
 );
 
-// app.use((req, res, next) => {
-//   res.setHeader("Access-Control-Allow-Origin", "*");
-//   res.setHeader(
-//     "Access-Control-Allow-Headers",
-//     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-//   );
-//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
 
-//   next();
-// });
+  next();
+});
 
 bot.on("message", async (message) => {
   if (message.text === "/start") {
@@ -54,18 +54,22 @@ app.post(
   "/",
   fileUpload.single("image"),
   async (req: Request, res: Response) => {
-    const { queryId, image } = req.body.formData;
+    const { queryId } = req.body;
+    const image = req.file;
+
+    console.log(image);
 
     if (!image) {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
     try {
+      const photoUlr = `http://localhost:3000/uploads/images/${image.filename}`;
       await bot.answerWebAppQuery(queryId, {
         type: "photo",
         id: queryId,
-        photo_url: image.path,
-        thumb_url: image.path,
+        photo_url: photoUlr,
+        thumb_url: photoUlr,
       });
 
       return res.status(200).json();
@@ -81,4 +85,4 @@ app.post(
   }
 );
 
-app.listen(process.env.PORT || 3000);
+app.listen(3000);

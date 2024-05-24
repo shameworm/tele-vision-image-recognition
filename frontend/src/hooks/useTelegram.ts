@@ -15,5 +15,6 @@ export const useTelegram = () => {
     onClose,
     onStart,
     queryId: tg.initDataUnsafe?.query_id,
+    chatId: tg.initDataUnsafe?.user?.id,
   };
 };

@@ -12,15 +12,16 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
   const [file, setFile] = useState<File>();
   const [previewUrl, setPreviewUrl] = useState<string>();
   const [isValid, setIsValid] = useState(false);
-  const { tg, onClose, queryId } = useTelegram();
+  const { tg, onClose, queryId, chatId } = useTelegram();
 
   const filePickerRef = useRef<HTMLInputElement | null>();
 
   const onSendData = useCallback(async () => {
-    if (file && queryId) {
+    if (file && queryId && chatId) {
       const formData = new FormData();
       formData.append("image", file);
       formData.append("queryId", queryId);
+      formData.append("chatId", chatId.toString());
 
       await fetch("http://localhost:3000/", {
         method: "POST",
@@ -34,7 +35,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
 
       tg.sendData(JSON.stringify(formDataEntries));
     }
-  }, [tg, queryId, file]);
+  }, [tg, queryId, chatId, file]);
 
   useEffect(() => {
     tg.onEvent("mainButtonClicked", onSendData);
