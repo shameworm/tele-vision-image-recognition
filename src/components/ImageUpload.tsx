@@ -23,7 +23,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
       formData.append("queryId", queryId);
       formData.append("chatId", chatId.toString());
 
-      await fetch("http://localhost:3000/", {
+      await fetch("https://tele-vision-9c692735ad8e.herokuapp.com/", {
         method: "POST",
         body: formData,
       });
