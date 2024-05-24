@@ -23,7 +23,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
       formData.append("queryId", queryId);
       formData.append("chatId", chatId.toString());
 
-      await fetch(import.meta.env.VITE_WEB_API, {
+      await fetch("http://localhost:3000/", {
         method: "POST",
         body: formData,
       });
