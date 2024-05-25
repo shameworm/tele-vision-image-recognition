@@ -12,28 +12,36 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ id, errorText }) => {
   const [file, setFile] = useState<File>();
   const [previewUrl, setPreviewUrl] = useState<string>();
   const [isValid, setIsValid] = useState(false);
+  // const [description, setDescipriton] = useState("");
   const { tg, onClose, queryId, chatId } = useTelegram();
 
   const filePickerRef = useRef<HTMLInputElement | null>();
 
   const onSendData = useCallback(async () => {
-    if (file && queryId && chatId) {
-      const formData = new FormData();
-      formData.append("image", file);
-      formData.append("queryId", queryId);
-      formData.append("chatId", chatId.toString());
+    if (!file || !queryId || !chatId) return;
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("queryId", queryId);
+    formData.append("chatId", chatId.toString());
 
-      await fetch("https://tele-vision-9c692735ad8e.herokuapp.com/", {
-        method: "POST",
-        body: formData,
-      });
+    try {
+      const response = await fetch(
+        "https://tele-vision-9c692735ad8e.herokuapp.com/",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
+      console.log(response);
       const formDataEntries: { [key: string]: unknown } = {};
       formData.forEach((value, key) => {
         formDataEntries[key] = value;
       });
 
       tg.sendData(JSON.stringify(formDataEntries));
+    } catch (err) {
+      console.error("There was a problem with the fetch operation:", err);
     }
   }, [tg, queryId, chatId, file]);
 
